@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yealink Phone Configurator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="submit"], input[type="file"] {
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Yealink Phone Configurator</h2>
+        <form id="configForm">
+            <label for="extension">Extension Number:</label>
+            <input type="text" id="extension" name="extension" required>
+
+            <label for="fullname">Full Name & Surname:</label>
+            <input type="text" id="fullname" name="fullname" required>
+
+            <label for="dhcphostname">DHCP Hostname:</label>
+            <input type="text" id="dhcphostname" name="dhcphostname" required>
+
+            <label for="agentname">Agent Name:</label>
+            <input type="text" id="agentname" name="agentname" required>
+
+            <label for="macaddress">MAC Address:</label>
+            <input type="text" id="macaddress" name="macaddress" required>
+
+            <input type="submit" value="Create Config">
+        </form>
+    </div>
+    <div class="container">
+        <h2>Upload JSON to Create Multiple Configs</h2>
+        <form id="jsonForm" enctype="multipart/form-data">
+            <label for="jsonfile">JSON File:</label>
+            <input type="file" id="jsonfile" name="jsonfile" accept=".json" required>
+            <input type="submit" value="Upload JSON">
+        </form>
+    </div>
+    <script>
+		document.getElementById('configForm').addEventListener('submit', function(event) {
+			event.preventDefault();
+
+			var formData = new FormData(this);
+			var searchParams = new URLSearchParams();
+
+			for (const pair of formData) {
+				searchParams.append(pair[0], pair[1]);
+			}
+
+			console.log("Sending data for individual config:", Array.from(searchParams.entries()));
+
+			fetch('/runscript', {
+				method: 'POST',
+				body: searchParams
+			})
+			.then(response => response.text())
+			.then(data => alert(data))
+			.catch(error => console.error('Error:', error));
+		});
+
+		document.getElementById('jsonForm').addEventListener('submit', function(event) {
+			event.preventDefault();
+			var formData = new FormData(this);
+
+			console.log("Sending JSON file for processing:", formData.get('jsonfile'));
+
+			fetch('/uploadjson', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.text())
+			.then(data => alert(data))
+			.catch(error => console.error('Error:', error));
+		});
+	</script>
+
+</body>
+</html>
