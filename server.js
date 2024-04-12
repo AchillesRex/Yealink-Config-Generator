@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure the JSON directory exists
-const jsonDir = '/volume2/ITStore/json/';
+const jsonDir = '/<Secret>/';
 fs.mkdirSync(jsonDir, { recursive: true });
 
 // Configure multer for file uploads
@@ -27,13 +27,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve your index.html file
 app.get('/', (req, res) => {
-    res.sendFile('/volume2/ITStore/index.html');
+    res.sendFile('/<Secret>.html');
 });
 
 // Endpoint to execute Python script for single config generation
 app.post('/runscript', (req, res) => {
     const { extension, fullname, dhcphostname, agentname, macaddress } = req.body;
-    const command = `/usr/local/bin/python3 /volume2/ITStore/Yealink.py ${extension} "${fullname}" "${dhcphostname}" "${agentname}" ${macaddress}`;
+    const command = `/usr/local/bin/python3 /<Secret>.py ${extension} "${fullname}" "${dhcphostname}" "${agentname}" ${macaddress}`;
     console.log("Executing command for single config:", command);
 
     exec(command, (error, stdout, stderr) => {
@@ -57,7 +57,7 @@ app.post('/uploadjson', upload.single('jsonfile'), (req, res) => {
     console.log("Received file for JSON upload:", req.file);
 
     // Construct the command to execute the Python script
-    const command = `/usr/local/bin/python3 /volume2/ITStore/Yealink.py "${req.file.path}"`;
+    const command = `/usr/local/bin/python3 /<Secret>.py "${req.file.path}"`;
     console.log("Executing command for JSON processing:", command);
 
     exec(command, {maxBuffer: 1024 * 1024 * 5}, (error, stdout, stderr) => {
